@@ -18,6 +18,8 @@ services:
     container_name: taram-backend
     # ports: - "8080:8080" # No longer exposed directly
     environment:
+      - DATABASE_URL=file:./dev.db
+      - PORT=8080
       - NODE_ENV=production
       - SMTP_HOST=maildev
       - SMTP_PORT=1025

@@ -4,6 +4,7 @@ import type { Network, ApiResponse } from '../types';
 export const networksService = {
     getAll: async () => {
         const response = await api.get<ApiResponse<Network[]>>('/networks');
+        if (!response.data || !response.data.data) throw new Error('Invalid response from server');
         return response.data.data;
     },
     getById: async (id: string) => {

@@ -20,24 +20,20 @@ cd taram
 Copiez les fichiers d'exemple pour le backend :
 ```bash
 cp backend/.env.example backend/.env
-```
-
-## 🚀 Lancement du projet
-
-Vous pouvez lancer le projet de deux manières différentes selon vos besoins.
+## Lancement
 
 ### Option A : Via Docker (Recommandé)
-C'est la méthode la plus rapide pour avoir la stack complète (Front, Back, DB, Proxy, Maildev) prête à l'emploi.
+Le moyen le plus simple de tout lancer en une seule commande (Frontend + Backend + Proxy + Maildev).
 
 ```bash
 docker-compose up --build
 ```
-- **Interface Admin** : [http://localhost](http://localhost)
-- **API Swagger** : [http://localhost/api-docs](http://localhost/api-docs)
-- **Maildev (Emails)** : [http://localhost:1080](http://localhost:1080)
+
+- 🚀 **Interface d'Administration** : [http://localhost](http://localhost)
+- 🔌 **API / Documentation** : [http://localhost/api-docs](http://localhost/api-docs)
+- 📧 **Emails (Maildev)** : [http://localhost:1080](http://localhost:1080)
 
 ### Option B : Lancement manuel (Développement)
-Utile si vous souhaitez modifier le code et voir les changements instantanément sans reconstruire les containers.
 
 #### 1. Backend
 ```bash
@@ -50,6 +46,7 @@ npm run dev
 #### 2. Frontend
 ```bash
 cd frontend
+cp .env.example .env  # IMPORTANT : Configurez l'URL de l'API (http://localhost:8080/api)
 npm install
 npm run dev
 ```

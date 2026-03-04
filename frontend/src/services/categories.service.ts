@@ -4,6 +4,7 @@ import type { Category, ApiResponse } from '../types';
 export const categoriesService = {
     getAll: async () => {
         const response = await api.get<ApiResponse<Category[]>>('/categories');
+        if (!response.data || !response.data.data) throw new Error('Invalid response from server');
         return response.data.data;
     },
     getById: async (id: string) => {

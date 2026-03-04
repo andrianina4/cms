@@ -12,6 +12,7 @@ export const articlesService = {
         featured?: boolean;
     }) => {
         const response = await api.get<PaginatedResponse<Article>>('/articles', { params });
+        if (!response.data) throw new Error('Invalid response from server');
         return response.data;
     },
 
