@@ -1,10 +1,12 @@
 import express, { Request, Response } from "express";
+import cors from "cors";
 import { config } from "./config";
 import articleRoutes from "./routes/article.routes";
 
 const app = express();
 const PORT = config.port;
 
+app.use(cors());
 app.use(express.json());
 
 app.use("/api/articles", articleRoutes);

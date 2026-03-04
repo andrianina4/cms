@@ -17,6 +17,7 @@ export class ArticleController {
             });
             res.json(articles);
         } catch (error: any) {
+            console.error("Error in ArticleController.getAll:", error);
             res.status(500).json({ error: error.message });
         }
     };
