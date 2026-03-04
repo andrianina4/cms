@@ -1,5 +1,4 @@
-import { X, Layout, Eye } from 'lucide-react';
-import { cn } from '../../lib/utils';
+import { X, Layout, Eye, Star } from 'lucide-react';
 import type { Article } from '../../types';
 
 interface ArticlePreviewModalProps {
@@ -43,8 +42,13 @@ export function ArticlePreviewModal({ article, isOpen, onClose }: ArticlePreview
                 {/* Scrollable Content */}
                 <div className="flex-1 overflow-y-auto p-10 custom-scrollbar">
                     <div className="max-w-3xl mx-auto space-y-8">
-                        {/* Categories */}
-                        <div className="flex flex-wrap gap-2">
+                        <div className="flex flex-wrap items-center gap-2">
+                            {article.featured && (
+                                <span className="flex items-center gap-1.5 px-4 py-1.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-600 border border-amber-200 uppercase tracking-wider">
+                                    <Star className="w-3.5 h-3.5 fill-current" />
+                                    Mise en avant
+                                </span>
+                            )}
                             {article.categories.map((cat) => (
                                 <span
                                     key={cat.id}

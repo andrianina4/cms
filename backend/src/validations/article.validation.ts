@@ -29,3 +29,7 @@ export const importArticleSchema = z.object({
     category: z.string().optional(),
     categories: z.union([z.string(), z.array(z.string())]).optional(),
 });
+export const bulkStatusSchema = z.object({
+    ids: z.array(z.string()).min(1, "Au moins un ID d'article est requis"),
+    status: z.enum(["draft", "published", "archived"]),
+});

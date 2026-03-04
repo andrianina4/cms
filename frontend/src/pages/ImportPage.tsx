@@ -12,7 +12,7 @@ import { cn } from '../lib/utils';
 import { Button } from '../components/ui/button';
 import { importService } from '../services/import.service';
 import type { ImportResult } from '../services/import.service';
-import { useToastStore } from '../store';
+import { useToastStore, useAuthStore } from '../store';
 
 export function ImportPage() {
     const [isDragging, setIsDragging] = useState(false);
@@ -20,6 +20,8 @@ export function ImportPage() {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const { addToast } = useToastStore();
     const queryClient = useQueryClient();
+    const { user } = useAuthStore();
+    const isAdmin = user?.role === 'admin';
 
     const importMutation = useMutation({
         mutationFn: async (file: File) => {
@@ -108,6 +110,24 @@ export function ImportPage() {
         }
     };
 
+
+    if (!isAdmin) {
+        return (
+            <div className="flex flex-col items-center justify-center py-20 text-center space-y-4">
+                <div className="w-20 h-20 rounded-3xl bg-red-50 text-red-500 flex items-center justify-center">
+                    <AlertCircle className="w-10 h-10" />
+                </div>
+                <h2 className="text-2xl font-bold text-slate-800 font-serif">Accès Refusé</h2>
+                <p className="text-slate-500 max-w-md">
+                    Désolé, vous n'avez pas les permissions nécessaires pour accéder à l'outil d'importation.
+                    Seuls les administrateurs peuvent importer des données massives.
+                </p>
+                <Button onClick={() => window.history.back()} variant="outline" className="rounded-xl px-8 py-2.5">
+                    Retour
+                </Button>
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-8 max-w-[1200px] mx-auto">

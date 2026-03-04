@@ -1,4 +1,5 @@
 import swaggerJsdoc from 'swagger-jsdoc';
+import path from 'path';
 import { config } from './config';
 
 const options = {
@@ -17,15 +18,26 @@ const options = {
         ],
         components: {
             securitySchemes: {
-                bearerAuth: {
-                    type: 'http',
-                    scheme: 'bearer',
-                    bearerFormat: 'JWT',
+                roleAuth: {
+                    type: 'apiKey',
+                    in: 'header',
+                    name: 'x-user-role',
+                    description: 'Rôle de l\'utilisateur pour simuler les permissions (admin ou editor)',
                 },
             },
         },
+        security: [
+            {
+                roleAuth: [],
+            },
+        ],
     },
-    apis: ['./src/routes/*.ts', './src/controllers/*.ts', './src/models/*.ts'], // Path to the API docs
+    apis: [
+        path.join(__dirname, './routes/*.ts'),
+        path.join(__dirname, './routes/*.js'),
+        path.join(__dirname, './controllers/*.ts'),
+        path.join(__dirname, './controllers/*.js'),
+    ],
 };
 
 export const swaggerSpec = swaggerJsdoc(options);

@@ -38,6 +38,10 @@ export class ArticleService {
         return this.articleRepository.update(id, { status });
     }
 
+    async bulkUpdateStatus(ids: string[], status: ArticleStatus): Promise<number> {
+        return this.articleRepository.updateManyStatus(ids, status);
+    }
+
     async notifyArticle(id: string) {
         const article = await this.getArticleById(id);
         // Simulation d'envoi de notification

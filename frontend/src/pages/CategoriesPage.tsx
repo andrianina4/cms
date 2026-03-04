@@ -5,6 +5,7 @@ import { CategoryCard } from '../components/categories/CategoryCard';
 import { CategoryForm } from '../components/categories/CategoryForm';
 import { Button } from '../components/ui/button';
 import { Plus } from 'lucide-react';
+import { useAuthStore, useToastStore } from '../store';
 
 export function CategoriesPage() {
     const [categories, setCategories] = useState<Category[]>([]);
@@ -12,6 +13,9 @@ export function CategoriesPage() {
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [editingCategory, setEditingCategory] = useState<Category | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const { user } = useAuthStore();
+    const { addToast } = useToastStore();
+    const isAdmin = user?.role === 'admin';
 
     const fetchCategories = async () => {
         try {
@@ -43,8 +47,10 @@ export function CategoriesPage() {
         if (window.confirm('Êtes-vous sûr de vouloir supprimer cette catégorie ?')) {
             try {
                 await categoriesService.delete(id);
+                addToast('Catégorie supprimée avec succès', 'success');
                 fetchCategories();
-            } catch (error) {
+            } catch (error: any) {
+                addToast(error.message || 'Erreur lors de la suppression', 'error');
                 console.error('Failed to delete category:', error);
             }
         }
@@ -55,12 +61,15 @@ export function CategoriesPage() {
             setIsSubmitting(true);
             if (editingCategory) {
                 await categoriesService.update(editingCategory.id, data);
+                addToast('Catégorie mise à jour avec succès', 'success');
             } else {
                 await categoriesService.create(data);
+                addToast('Catégorie créée avec succès', 'success');
             }
             setIsFormOpen(false);
             fetchCategories();
-        } catch (error) {
+        } catch (error: any) {
+            addToast(error.message || 'Erreur lors de l\'enregistrement', 'error');
             console.error('Failed to save category:', error);
         } finally {
             setIsSubmitting(false);
@@ -74,13 +83,15 @@ export function CategoriesPage() {
                     <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Catégories</h1>
                     <p className="text-slate-500 mt-1">Gérez les catégories éditoriales</p>
                 </div>
-                <Button
-                    onClick={handleCreate}
-                    className="rounded-full bg-[#b59a42] hover:bg-[#a1893a] text-white px-6 h-12 shadow-md shadow-yellow-900/10 flex items-center space-x-2"
-                >
-                    <Plus className="h-5 w-5" />
-                    <span>Nouvelle catégorie</span>
-                </Button>
+                {isAdmin && (
+                    <Button
+                        onClick={handleCreate}
+                        className="rounded-full bg-[#b59a42] hover:bg-[#a1893a] text-white px-6 h-12 shadow-md shadow-yellow-900/10 flex items-center space-x-2"
+                    >
+                        <Plus className="h-5 w-5" />
+                        <span>Nouvelle catégorie</span>
+                    </Button>
+                )}
             </div>
 
             {isLoading ? (
@@ -93,8 +104,8 @@ export function CategoriesPage() {
                         <CategoryCard
                             key={category.id}
                             category={category}
-                            onEdit={handleEdit}
-                            onDelete={handleDelete}
+                            onEdit={isAdmin ? handleEdit : undefined}
+                            onDelete={isAdmin ? handleDelete : undefined}
                         />
                     ))}
                 </div>
@@ -102,13 +113,15 @@ export function CategoriesPage() {
                 <div className="bg-white p-16 rounded-3xl border border-dashed border-slate-200 text-center">
                     <h4 className="text-slate-800 font-bold text-lg">Aucune catégorie</h4>
                     <p className="text-slate-500 mt-2">Commencez par ajouter une catégorie pour organiser votre contenu.</p>
-                    <Button
-                        onClick={handleCreate}
-                        variant="link"
-                        className="text-[#b59a42] mt-4 font-bold"
-                    >
-                        + Créer une catégorie
-                    </Button>
+                    {isAdmin && (
+                        <Button
+                            onClick={handleCreate}
+                            variant="link"
+                            className="text-[#b59a42] mt-4 font-bold"
+                        >
+                            + Créer une catégorie
+                        </Button>
+                    )}
                 </div>
             )}
 

@@ -19,11 +19,15 @@ import { ArticlePreviewModal } from '../components/articles/ArticlePreviewModal'
 import type { Article } from '../types';
 import { formatDate } from '../utils';
 import { cn } from '../lib/utils';
+import { useAuthStore, useToastStore } from '../store';
 import * as React from 'react';
 
 export function ArticlesPage() {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
+    const { user } = useAuthStore();
+    const { addToast } = useToastStore();
+    const isAdmin = user?.role === 'admin';
     const [selectedArticles, setSelectedArticles] = React.useState<Article[]>([]);
     const [previewArticle, setPreviewArticle] = React.useState<Article | null>(null);
 
@@ -67,21 +71,45 @@ export function ArticlesPage() {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['articles'] });
             setSelectedArticles([]);
+            addToast('Article supprimé avec succès', 'success');
+        },
+        onError: (error: any) => {
+            addToast(error.message || 'Erreur lors de la suppression', 'error');
         }
     });
 
     const updateMutation = useMutation({
         mutationFn: ({ id, data }: { id: string, data: Partial<Article> }) =>
             articlesService.update(id, data),
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['articles'] })
+        onSuccess: (_, variables) => {
+            queryClient.invalidateQueries({ queryKey: ['articles'] });
+            if (variables.data.status === 'archived') {
+                addToast('Article archivé avec succès', 'success');
+            } else if (variables.data.featured !== undefined) {
+                addToast(variables.data.featured ? 'Article mis à la une' : 'Article retiré de la une', 'success');
+            } else {
+                addToast('Article mis à jour', 'success');
+            }
+        },
+        onError: (error: any) => {
+            addToast(error.message || 'Erreur lors de la mise à jour', 'error');
+        }
     });
 
     const bulkUpdateMutation = useMutation({
         mutationFn: ({ ids, status }: { ids: string[], status: string }) =>
             articlesService.bulkUpdateStatus(ids, status),
-        onSuccess: () => {
+        onSuccess: (_, variables) => {
             queryClient.invalidateQueries({ queryKey: ['articles'] });
             setSelectedArticles([]);
+            const count = variables.ids.length;
+            const message = variables.status === 'published'
+                ? `${count} article(s) publié(s) avec succès`
+                : `${count} article(s) archivé(s) avec succès`;
+            addToast(message, 'success');
+        },
+        onError: (error: any) => {
+            addToast(error.message || 'Erreur lors de la mise à jour groupée', 'error');
         }
     });
 
@@ -197,27 +225,31 @@ export function ArticlesPage() {
                         <Star className={cn("w-4 h-4", row.original.featured && "fill-amber-400")} />
                     </button>
                     <button
-                        onClick={() => handleArchive(row.original.id)}
-                        disabled={row.original.status === 'archived'}
-                        className="p-1.5 hover:bg-white border border-transparent hover:border-slate-100 rounded-lg text-slate-400 hover:text-indigo-400 transition-all disabled:opacity-30"
-                        title="Archiver"
-                    >
-                        <Archive className="w-4 h-4" />
-                    </button>
-                    <button
                         onClick={() => setPreviewArticle(row.original)}
                         className="p-1.5 hover:bg-white border border-transparent hover:border-slate-100 rounded-lg text-slate-400 hover:text-blue-500 transition-all"
                         title="Aperçu"
                     >
                         <Eye className="w-4 h-4" />
                     </button>
-                    <button
-                        onClick={() => handleDelete(row.original.id)}
-                        className="p-1.5 hover:bg-white border border-transparent hover:border-slate-100 rounded-lg text-slate-400 hover:text-red-500 transition-all"
-                        title="Supprimer"
-                    >
-                        <Trash2 className="w-4 h-4" />
-                    </button>
+                    {isAdmin && (
+                        <>
+                            <button
+                                onClick={() => handleArchive(row.original.id)}
+                                disabled={row.original.status === 'archived'}
+                                className="p-1.5 hover:bg-white border border-transparent hover:border-slate-100 rounded-lg text-slate-400 hover:text-indigo-400 transition-all disabled:opacity-30"
+                                title="Archiver"
+                            >
+                                <Archive className="w-4 h-4" />
+                            </button>
+                            <button
+                                onClick={() => handleDelete(row.original.id)}
+                                className="p-1.5 hover:bg-white border border-transparent hover:border-slate-100 rounded-lg text-slate-400 hover:text-red-500 transition-all"
+                                title="Supprimer"
+                            >
+                                <Trash2 className="w-4 h-4" />
+                            </button>
+                        </>
+                    )}
                 </div>
             ),
         },
@@ -258,15 +290,19 @@ export function ArticlesPage() {
                             <CheckCircle2 className="w-4 h-4" />
                             Publier
                         </button>
-                        <button
-                            onClick={() => bulkUpdateMutation.mutate({ ids: selectedArticles.map(a => a.id), status: 'archived' })}
-                            className="bg-slate-200 hover:bg-slate-300 text-slate-700 px-4 py-2 rounded-xl text-xs font-bold transition-all"
-                        >
-                            Archiver
-                        </button>
-                        <button className="bg-red-100 hover:bg-red-200 text-red-600 px-4 py-2 rounded-xl text-xs font-bold transition-all">
-                            Supprimer
-                        </button>
+                        {isAdmin && (
+                            <>
+                                <button
+                                    onClick={() => bulkUpdateMutation.mutate({ ids: selectedArticles.map(a => a.id), status: 'archived' })}
+                                    className="bg-slate-200 hover:bg-slate-300 text-slate-700 px-4 py-2 rounded-xl text-xs font-bold transition-all"
+                                >
+                                    Archiver
+                                </button>
+                                <button className="bg-red-100 hover:bg-red-200 text-red-600 px-4 py-2 rounded-xl text-xs font-bold transition-all">
+                                    Supprimer
+                                </button>
+                            </>
+                        )}
                     </div>
                 </div>
             )}

@@ -93,4 +93,14 @@ export class ArticleController {
             return sendError(res, error.message, 400);
         }
     };
+
+    bulkUpdateStatus = async (req: Request, res: Response) => {
+        try {
+            const { ids, status } = req.body;
+            const count = await this.articleService.bulkUpdateStatus(ids, status as ArticleStatus);
+            return sendSuccess(res, { count }, `${count} articles updated successfully`);
+        } catch (error: any) {
+            return sendError(res, error.message, 400);
+        }
+    };
 }

@@ -6,7 +6,8 @@ import {
     Send,
     ChevronDown,
     Eye,
-    Layout
+    Layout,
+    Star
 } from 'lucide-react';
 import { articleSchema } from '../utils/validation';
 import { categoriesService } from '../services/categories.service';
@@ -14,10 +15,14 @@ import { networksService } from '../services/networks.service';
 import { articlesService } from '../services/articles.service';
 import { CategoryPicker } from '../components/articles/CategoryPicker';
 import { cn } from '../lib/utils';
+import * as React from 'react';
+import { useToastStore } from '../store';
 
 export function NewArticlePage() {
     const navigate = useNavigate();
-    const isAutoSaving = false;
+    const { addToast } = useToastStore();
+    const [isAutoSaving, setIsAutoSaving] = React.useState(false);
+    const [lastSaved, setLastSaved] = React.useState<Date | null>(null);
 
     // Fetch setup data
     const { data: categories = [] } = useQuery({
@@ -36,7 +41,7 @@ export function NewArticlePage() {
         watch,
         control,
         setValue,
-        formState: { errors, isValid }
+        formState: { errors, isValid, isDirty }
     } = useForm({
         resolver: zodResolver(articleSchema),
         defaultValues: {
@@ -54,7 +59,16 @@ export function NewArticlePage() {
 
     const createMutation = useMutation({
         mutationFn: articlesService.create,
-        onSuccess: () => navigate('/articles'),
+        onSuccess: (_newArticle, variables) => {
+            // Only show main success toast if not an auto-save (handled in useEffect)
+            if (variables.status !== 'draft') {
+                addToast('Article créé avec succès', 'success');
+            }
+            navigate('/articles');
+        },
+        onError: (error: any) => {
+            addToast(error.message || 'Erreur lors de la création', 'error');
+        }
     });
 
     const onSubmit = (data: any) => {
@@ -65,6 +79,36 @@ export function NewArticlePage() {
         setValue('status', status);
         handleSubmit(onSubmit)();
     };
+
+    // Auto-save logic
+    React.useEffect(() => {
+        const interval = setInterval(() => {
+            if (isDirty && isValid && !createMutation.isPending && !isAutoSaving) {
+                console.log('Auto-saving draft...');
+                setIsAutoSaving(true);
+
+                const currentData = watch();
+                // Ensure status is draft for auto-save
+                const dataToSave = { ...currentData, status: 'draft' as const };
+
+                createMutation.mutate(dataToSave, {
+                    onSuccess: (newArticle) => {
+                        setIsAutoSaving(false);
+                        setLastSaved(new Date());
+                        // Redirect to edit page after first successful auto-save
+                        // This prevents creating multiple articles if user stays on this page
+                        navigate(`/articles/edit/${newArticle.id}`, { replace: true });
+                        addToast('Brouillon auto-enregistré', 'success');
+                    },
+                    onError: () => {
+                        setIsAutoSaving(false);
+                    }
+                });
+            }
+        }, 30000); // 30 seconds
+
+        return () => clearInterval(interval);
+    }, [isDirty, isValid, createMutation, isAutoSaving, watch, navigate]);
 
     return (
         <div className="max-w-[1600px] mx-auto">
@@ -82,7 +126,9 @@ export function NewArticlePage() {
                             isAutoSaving ? "bg-indigo-50 text-indigo-600" : "bg-emerald-50 text-emerald-600"
                         )}>
                             <div className={cn("w-2 h-2 rounded-full animate-pulse", isAutoSaving ? "bg-indigo-500" : "bg-emerald-500")} />
-                            <span className="text-[11px] font-bold uppercase tracking-wider">{isAutoSaving ? 'Sauvegarde...' : 'Sauvegardé'}</span>
+                            <span className="text-[11px] font-bold uppercase tracking-wider">
+                                {isAutoSaving ? 'Sauvegarde...' : lastSaved ? `Enregistré à ${lastSaved.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}` : 'Sauvegardé'}
+                            </span>
                         </div>
 
                         <button
@@ -258,7 +304,13 @@ export function NewArticlePage() {
 
                         <div className="bg-white rounded-[40px] p-10 border border-slate-100 shadow-xl shadow-slate-200/50 min-h-full">
                             <div className="space-y-6">
-                                <div className="flex flex-wrap gap-2">
+                                <div className="flex flex-wrap items-center gap-2">
+                                    {formData.featured && (
+                                        <span className="flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold bg-amber-50 text-amber-600 border border-amber-200 uppercase tracking-wider">
+                                            <Star className="w-3.5 h-3.5 fill-current" />
+                                            Mise en avant
+                                        </span>
+                                    )}
                                     {formData.categoryIds.map(id => {
                                         const cat = categories.find(c => c.id === id);
                                         if (!cat) return null;

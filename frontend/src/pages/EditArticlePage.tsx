@@ -8,7 +8,8 @@ import {
     Eye,
     Layout,
     ArrowLeft,
-    Loader2
+    Loader2,
+    Star
 } from 'lucide-react';
 import { articleSchema } from '../utils/validation';
 import { categoriesService } from '../services/categories.service';
@@ -18,12 +19,16 @@ import { CategoryPicker } from '../components/articles/CategoryPicker';
 import { ArticlePreviewModal } from '../components/articles/ArticlePreviewModal';
 import { cn } from '../lib/utils';
 import * as React from 'react';
+import { useToastStore } from '../store';
 
 export function EditArticlePage() {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const queryClient = useQueryClient();
+    const { addToast } = useToastStore();
     const [isPreviewOpen, setIsPreviewOpen] = React.useState(false);
+    const [isAutoSaving, setIsAutoSaving] = React.useState(false);
+    const [lastSaved, setLastSaved] = React.useState<Date | null>(null);
 
     // Fetch setup data
     const { data: categories = [] } = useQuery({
@@ -50,7 +55,7 @@ export function EditArticlePage() {
         control,
         setValue,
         reset,
-        formState: { errors, isValid }
+        formState: { errors, isValid, isDirty }
     } = useForm({
         resolver: zodResolver(articleSchema),
         defaultValues: {
@@ -85,10 +90,16 @@ export function EditArticlePage() {
 
     const updateMutation = useMutation({
         mutationFn: (data: any) => articlesService.update(id!, data),
-        onSuccess: () => {
+        onSuccess: (_, _variables) => {
             queryClient.invalidateQueries({ queryKey: ['articles'] });
+            // Only show main success toast if not an auto-save (handled in useEffect)
+            // Auto-save uses onSuccess callback locally
+            addToast('Article mis à jour avec succès', 'success');
             navigate('/articles');
         },
+        onError: (error: any) => {
+            addToast(error.message || 'Erreur lors de la mise à jour', 'error');
+        }
     });
 
     const onSubmit = (data: any) => {
@@ -99,6 +110,33 @@ export function EditArticlePage() {
         setValue('status', status);
         handleSubmit(onSubmit)();
     };
+
+    // Auto-save logic
+    React.useEffect(() => {
+        const interval = setInterval(() => {
+            if (isDirty && !updateMutation.isPending && !isAutoSaving && article) {
+                console.log('Auto-saving draft...');
+                setIsAutoSaving(true);
+
+                const currentData = watch();
+                // Ensure status is draft for auto-save
+                const dataToSave = { ...currentData, status: 'draft' as const };
+
+                updateMutation.mutate(dataToSave, {
+                    onSuccess: () => {
+                        setIsAutoSaving(false);
+                        setLastSaved(new Date());
+                        addToast('Brouillon mis à jour', 'success');
+                    },
+                    onError: () => {
+                        setIsAutoSaving(false);
+                    }
+                });
+            }
+        }, 30000); // 30 seconds
+
+        return () => clearInterval(interval);
+    }, [isDirty, updateMutation, isAutoSaving, watch, article]);
 
     if (isFetching) {
         return (
@@ -154,6 +192,15 @@ export function EditArticlePage() {
                     </div>
 
                     <div className="flex items-center gap-4">
+                        <div className={cn(
+                            "flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300",
+                            isAutoSaving ? "bg-indigo-50 text-indigo-600" : "bg-emerald-50 text-emerald-600"
+                        )}>
+                            <div className={cn("w-2 h-2 rounded-full animate-pulse", isAutoSaving ? "bg-indigo-500" : "bg-emerald-500")} />
+                            <span className="text-[11px] font-bold uppercase tracking-wider">
+                                {isAutoSaving ? 'Sauvegarde...' : lastSaved ? `Enregistré à ${lastSaved.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}` : 'Sauvegardé'}
+                            </span>
+                        </div>
                         <button
                             type="button"
                             onClick={() => setIsPreviewOpen(true)}
@@ -336,7 +383,13 @@ export function EditArticlePage() {
 
                         <div className="bg-white rounded-[40px] p-10 border border-slate-100 shadow-xl shadow-slate-200/50 min-h-full">
                             <div className="space-y-6">
-                                <div className="flex flex-wrap gap-2">
+                                <div className="flex flex-wrap items-center gap-2">
+                                    {formData.featured && (
+                                        <span className="flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold bg-amber-50 text-amber-600 border border-amber-200 uppercase tracking-wider">
+                                            <Star className="w-3.5 h-3.5 fill-current" />
+                                            Mise en avant
+                                        </span>
+                                    )}
                                     {formData.categoryIds.map(id => {
                                         const cat = categories.find(c => c.id === id);
                                         if (!cat) return null;

@@ -9,10 +9,11 @@ Le projet est composé d'une interface d'administration moderne (Frontend React)
 ## 🚀 Fonctionnalités Principales
 
 *   **Gestion d'Articles** : Création, modification, archivage, et publication d'articles avec un éditeur de texte riche et prévisualisation en temps réel.
-*   **Organisation** : Structuration du contenu via des catégories dynamiques et des réseaux de diffusion.
-*   **Notifications** : Envoi et historique de notifications par email pour annoncer de nouvelles publications.
-*   **Import/Export** : Capacité d'importer des articles en masse via des fichiers JSON.
-*   **Tableau de bord** : Vue globale avec KPIs (articles publiés, brouillons, graphes par catégorie).
+- 📊 **Dashboard Analytique** : Statistiques en temps réel, graphiques de répartition et derniers articles.
+- 🔐 **Gestion des Rôles (RBAC)** : Système complet Admin vs Éditeur avec restrictions d'accès backend et UI adaptive.
+- 📦 **Import Bulk** : Importation massive d'articles via fichiers JSON (Admin uniquement).
+- 📧 **Notifications** : Système d'envoi d'emails pour les nouvelles publications avec historique.
+- 📑 **Documentation API** : Documentation interactive via Swagger/OpenAPI.
 
 ---
 
@@ -85,8 +86,36 @@ docker-compose up --build
 *   Le **Frontend** sera accessible sur : `http://localhost:5173`
 *   L'**API Backend** sera accessible sur : `http://localhost:8080/api`
 *   La **Documentation Swagger** sera sur : `http://localhost:8080/api-docs`
+*   🌍 **Visualisation des Emails (Maildev)** : `http://localhost:1080`
 
 ---
+
+### 📧 Visualisation des Emails (Développement)
+
+Pour tester l'envoi d'emails en local sans configurer de compte réel, nous utilisons **Maildev**. 
+- En mode Docker (`docker-compose up`), les emails envoyés par le backend sont automatiquement capturés.
+- Accédez à l'interface via : **[http://localhost:1080](http://localhost:1080)**
+
+---
+
+#### 🔐 Simulation des Rôles (RBAC)
+
+
+Pour faciliter les tests, le système inclus une simulation de rôles dans le Header :
+- **Admin** : Accès total (Suppression, Import, Gestion des catégories/réseaux, Notifications).
+- **Editor** : Accès restreint (Lecture seule sur la structure, création/édition d'articles uniquement, pas de suppression).
+
+Les requêtes API incluent automatiquement le header `x-user-role` pour validation côté serveur.
+
+### 📖 Documentation API
+
+La documentation Swagger est disponible une fois le backend lancé :
+- **URL** : `http://localhost:8080/api-docs`
+- **Authentification** : 
+    - Cliquez sur le bouton **"Authorize"** en haut à droite.
+    - Saisissez `admin` ou `editor` dans le champ de texte.
+    - Toutes les requêtes suivantes incluront automatiquement le header `x-user-role` avec cette valeur.
+- **Format** : OpenAPI 3.0
 
 ### Option 2 : Lancement Local (Développement)
 

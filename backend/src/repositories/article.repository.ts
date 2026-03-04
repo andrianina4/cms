@@ -15,6 +15,7 @@ export interface IArticleRepository {
     findById(id: string): Promise<ArticleModel | null>;
     create(data: CreateArticleDTO): Promise<ArticleModel>;
     update(id: string, data: UpdateArticleDTO): Promise<ArticleModel>;
+    updateManyStatus(ids: string[], status: string): Promise<number>;
     delete(id: string): Promise<ArticleModel>;
 }
 
@@ -121,5 +122,13 @@ export class ArticleRepository implements IArticleRepository {
             include: this.include
         });
         return article as unknown as ArticleModel;
+    }
+
+    async updateManyStatus(ids: string[], status: string): Promise<number> {
+        const result = await prisma.article.updateMany({
+            where: { id: { in: ids } },
+            data: { status }
+        });
+        return result.count;
     }
 }

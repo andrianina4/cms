@@ -14,30 +14,43 @@ import {
 import { cn } from '../../lib/utils';
 import { useUIStore, useAuthStore } from '../../store';
 
-const menuGroups = [
-    {
-        label: 'PRINCIPAL',
-        items: [
-            { name: 'Dashboard', icon: LayoutDashboard, path: '/' },
-            { name: 'Articles', icon: FileText, path: '/articles', count: 12 },
-            { name: 'Nouvel article', icon: PlusSquare, path: '/articles/new' },
-        ],
-    },
-    {
-        label: 'GESTION',
-        items: [
-            { name: 'Catégories', icon: FolderTree, path: '/categories' },
-            { name: 'Réseaux', icon: Globe, path: '/networks' },
-            { name: 'Notifications', icon: Bell, path: '/notifications' },
-            { name: 'Import JSON', icon: Upload, path: '/import' },
-        ],
-    },
-];
+interface MenuItem {
+    name: string;
+    icon: React.ElementType;
+    path: string;
+    count?: number;
+    roles?: string[];
+}
+
+interface MenuGroup {
+    label: string;
+    items: MenuItem[];
+}
 
 export function Sidebar() {
     const location = useLocation();
     const { isSidebarOpen, toggleSidebar } = useUIStore();
     const { user, logout } = useAuthStore();
+
+    const menuGroups: MenuGroup[] = [
+        {
+            label: 'PRINCIPAL',
+            items: [
+                { name: 'Dashboard', icon: LayoutDashboard, path: '/' },
+                { name: 'Articles', icon: FileText, path: '/articles' },
+                { name: 'Nouvel article', icon: PlusSquare, path: '/articles/new' },
+            ],
+        },
+        {
+            label: 'GESTION',
+            items: [
+                { name: 'Catégories', icon: FolderTree, path: '/categories' },
+                { name: 'Réseaux', icon: Globe, path: '/networks' },
+                { name: 'Notifications', icon: Bell, path: '/notifications' },
+                { name: 'Import JSON', icon: Upload, path: '/import', roles: ['admin'] },
+            ].filter(item => !item.roles || (user?.role && item.roles.includes(user.role))),
+        },
+    ];
 
     return (
         <>

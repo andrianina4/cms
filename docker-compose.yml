@@ -8,9 +8,22 @@ services:
       - "8080:8080"
     environment:
       - NODE_ENV=production
+      - SMTP_HOST=maildev
+      - SMTP_PORT=1025
+    depends_on:
+      - maildev
+    restart: unless-stopped
+
+  maildev:
+    image: maildev/maildev
+    container_name: taram-maildev
+    ports:
+      - "1080:1080"
+      - "1025:1025"
     restart: unless-stopped
 
   frontend:
+
     build:
       context: ./frontend
       dockerfile: Dockerfile

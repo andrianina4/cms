@@ -4,8 +4,8 @@ import { Button } from '../ui/button';
 
 interface CategoryCardProps {
     category: Category;
-    onEdit: (category: Category) => void;
-    onDelete: (id: string) => void;
+    onEdit?: (category: Category) => void;
+    onDelete?: (id: string) => void;
 }
 
 export function CategoryCard({ category, onEdit, onDelete }: CategoryCardProps) {
@@ -31,24 +31,30 @@ export function CategoryCard({ category, onEdit, onDelete }: CategoryCardProps) 
                 </div>
             </div>
 
-            <div className="flex items-center space-x-2">
-                <Button
-                    variant="outline"
-                    size="icon"
-                    className="h-10 w-10 rounded-xl border-orange-100 bg-orange-50/30 text-orange-500 hover:bg-orange-50 hover:text-orange-600 hover:border-orange-200"
-                    onClick={() => onEdit(category)}
-                >
-                    <Pencil className="h-4 w-4" />
-                </Button>
-                <Button
-                    variant="outline"
-                    size="icon"
-                    className="h-10 w-10 rounded-xl border-rose-100 bg-rose-50/30 text-rose-500 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200"
-                    onClick={() => onDelete(category.id)}
-                >
-                    <Trash2 className="h-4 w-4" />
-                </Button>
-            </div>
+            {(onEdit || onDelete) && (
+                <div className="flex items-center space-x-2">
+                    {onEdit && (
+                        <Button
+                            variant="outline"
+                            size="icon"
+                            className="h-10 w-10 rounded-xl border-orange-100 bg-orange-50/30 text-orange-500 hover:bg-orange-50 hover:text-orange-600 hover:border-orange-200"
+                            onClick={() => onEdit(category)}
+                        >
+                            <Pencil className="h-4 w-4" />
+                        </Button>
+                    )}
+                    {onDelete && (
+                        <Button
+                            variant="outline"
+                            size="icon"
+                            className="h-10 w-10 rounded-xl border-rose-100 bg-rose-50/30 text-rose-500 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200"
+                            onClick={() => onDelete(category.id)}
+                        >
+                            <Trash2 className="h-4 w-4" />
+                        </Button>
+                    )}
+                </div>
+            )}
         </div>
     );
 }

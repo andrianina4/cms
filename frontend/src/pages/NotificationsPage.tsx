@@ -16,9 +16,13 @@ import type { NotificationFormData } from '../utils/validation';
 import { cn } from '../lib/utils';
 import { Badge } from '../components/ui/badge';
 import { Button } from '../components/ui/button';
+import { useAuthStore, useToastStore } from '../store';
 
 export function NotificationsPage() {
     const queryClient = useQueryClient();
+    const { user } = useAuthStore();
+    const { addToast } = useToastStore();
+    const isAdmin = user?.role === 'admin';
 
     const {
         register,
@@ -58,11 +62,15 @@ export function NotificationsPage() {
         mutationFn: notificationsService.create,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['notifications'] });
+            addToast('Notification envoyée avec succès', 'success');
             reset({
                 articleId: '',
                 recipients: '',
                 subject: ''
             });
+        },
+        onError: (error: any) => {
+            addToast(error.message || "Erreur lors de l'envoi", 'error');
         }
     });
 
@@ -178,7 +186,7 @@ export function NotificationsPage() {
 
                             <Button
                                 type="submit"
-                                disabled={sendMutation.isPending}
+                                disabled={sendMutation.isPending || !isAdmin}
                                 className="bg-amber-600 hover:bg-amber-700 text-white rounded-xl px-8 py-6 font-bold text-sm shadow-xl shadow-amber-100 transition-all disabled:opacity-50 w-full sm:w-auto"
                             >
                                 {sendMutation.isPending ? (
@@ -187,7 +195,7 @@ export function NotificationsPage() {
                                         Envoi en cours...
                                     </>
                                 ) : (
-                                    'Envoyer la notification'
+                                    isAdmin ? 'Envoyer la notification' : 'Envoi réservé aux administrateurs'
                                 )}
                             </Button>
                         </div>
