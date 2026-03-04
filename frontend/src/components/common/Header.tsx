@@ -47,9 +47,10 @@ export function Header() {
 
     const handleUserSwitch = (role: string) => {
         const selectedUser = SIMULATED_USERS.find(u => u.role === role);
-        if (selectedUser) {
+        if (selectedUser && user?.role !== role) {
             setUser(selectedUser, 'simulated-token');
-            // Force reload to reset states if needed, but Zustand should be fine
+            // Force reload to completely reset API instances, query caches, and app state
+            window.location.reload();
         }
     };
 

@@ -10,6 +10,7 @@ export const sendSuccess = (res: Response, data: any, message: string = "Success
 };
 
 export const sendError = (res: Response, message: string = "Internal Server Error", statusCode: number = 500, meta?: any) => {
+    console.error(`[ERROR API - ${statusCode}]`, message, meta || '');
     return res.status(statusCode).json({
         success: false,
         message,

@@ -8,10 +8,12 @@ export const validate = (schema: ZodTypeAny) => {
             await schema.parseAsync(req.body);
             return next();
         } catch (error) {
+            console.error("[VALIDATION ERROR]:", error);
             if (error instanceof ZodError) {
                 const zodErr = error as any;
-                const errors = zodErr.errors.map((err: any) => ({
-                    path: err.path.join("."),
+                const issuesArray = zodErr.issues || zodErr.errors || [];
+                const errors = issuesArray.map((err: any) => ({
+                    path: err.path?.join(".") || '',
                     message: err.message,
                 }));
                 return sendError(res, "Validation failed", 400, { errors });
@@ -35,10 +37,12 @@ export const validateArray = (schema: ZodTypeAny) => {
 
             return next();
         } catch (error) {
+            console.error("[VALIDATION ERROR ARRAY]:", error);
             if (error instanceof ZodError) {
                 const zodErr = error as any;
-                const errors = zodErr.errors.map((err: any) => ({
-                    path: err.path.join("."),
+                const issuesArray = zodErr.issues || zodErr.errors || [];
+                const errors = issuesArray.map((err: any) => ({
+                    path: err.path?.join(".") || '',
                     message: err.message,
                 }));
                 return sendError(res, "Validation failed in array", 400, { errors });

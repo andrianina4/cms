@@ -17,3 +17,15 @@ export const updateArticleSchema = articleSchema.partial();
 export const updateStatusSchema = z.object({
     status: z.enum(["draft", "published", "archived"]),
 });
+
+export const importArticleSchema = z.object({
+    title: z.string().min(1, "Le titre est requis"),
+    content: z.string().optional(),
+    excerpt: z.string().optional(),
+    author: z.string().optional(),
+    network: z.string().min(1, "Le nom du réseau (network) est requis"),
+    status: z.enum(["draft", "published", "archived"]).optional(),
+    featured: z.boolean().optional(),
+    category: z.string().optional(),
+    categories: z.union([z.string(), z.array(z.string())]).optional(),
+});
