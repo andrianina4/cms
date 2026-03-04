@@ -13,7 +13,7 @@ TARAM est un CMS Headless moderne conçu pour simplifier la gestion de contenus 
 ### 1. Cloner le projet
 ```bash
 git clone git@github.com:andrianina4/cms.git
-cd taram
+cd cms
 ```
 
 ### 2. Configuration des variables d'environnement
