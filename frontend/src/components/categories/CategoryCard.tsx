@@ -20,9 +20,11 @@ export function CategoryCard({ category, onEdit, onDelete }: CategoryCardProps) 
                 </div>
                 <div>
                     <h4 className="font-bold text-slate-800">{category.name}</h4>
-                    <p className="text-xs text-slate-400 mt-0.5">
-                        {category.slug}
-                    </p>
+                    <div className="flex items-center gap-2 mt-0.5">
+                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{category.slug}</span>
+                        <span className="w-1 h-1 rounded-full bg-slate-300" />
+                        <span className="text-[10px] font-bold text-indigo-500 uppercase tracking-widest">{category.articleCount ?? 0} articles</span>
+                    </div>
                     {category.description && (
                         <p className="text-xs text-slate-500 mt-1 line-clamp-1 max-w-[200px]">
                             {category.description}

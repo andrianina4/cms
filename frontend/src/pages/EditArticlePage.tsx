@@ -98,7 +98,8 @@ export function EditArticlePage() {
             navigate('/articles');
         },
         onError: (error: any) => {
-            addToast(error.message || 'Erreur lors de la mise à jour', 'error');
+            const message = error.response?.data?.message || error.message || 'Erreur lors de la mise à jour';
+            addToast(message, 'error');
         }
     });
 

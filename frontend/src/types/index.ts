@@ -8,6 +8,7 @@ export interface Category {
     slug: string;
     description?: string;
     color: string;
+    articleCount?: number;
 }
 
 export interface Network {

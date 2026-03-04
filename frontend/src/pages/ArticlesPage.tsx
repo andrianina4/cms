@@ -74,7 +74,8 @@ export function ArticlesPage() {
             addToast('Article supprimé avec succès', 'success');
         },
         onError: (error: any) => {
-            addToast(error.message || 'Erreur lors de la suppression', 'error');
+            const message = error.response?.data?.message || error.message || 'Erreur lors de la suppression';
+            addToast(message, 'error');
         }
     });
 
@@ -92,7 +93,8 @@ export function ArticlesPage() {
             }
         },
         onError: (error: any) => {
-            addToast(error.message || 'Erreur lors de la mise à jour', 'error');
+            const message = error.response?.data?.message || error.message || 'Erreur lors de la mise à jour';
+            addToast(message, 'error');
         }
     });
 
@@ -109,7 +111,8 @@ export function ArticlesPage() {
             addToast(message, 'success');
         },
         onError: (error: any) => {
-            addToast(error.message || 'Erreur lors de la mise à jour groupée', 'error');
+            const message = error.response?.data?.message || error.message || 'Erreur lors de la mise à jour groupée';
+            addToast(message, 'error');
         }
     });
 

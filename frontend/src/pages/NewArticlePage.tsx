@@ -67,7 +67,8 @@ export function NewArticlePage() {
             navigate('/articles');
         },
         onError: (error: any) => {
-            addToast(error.message || 'Erreur lors de la création', 'error');
+            const message = error.response?.data?.message || error.message || 'Erreur lors de la création';
+            addToast(message, 'error');
         }
     });
 

@@ -50,7 +50,8 @@ export function NetworksPage() {
                 addToast('Réseau supprimé avec succès', 'success');
                 fetchNetworks();
             } catch (error: any) {
-                addToast(error.message || 'Erreur lors de la suppression', 'error');
+                const message = error.response?.data?.message || error.message || 'Erreur lors de la suppression';
+                addToast(message, 'error');
                 console.error('Failed to delete network:', error);
             }
         }
@@ -69,7 +70,8 @@ export function NetworksPage() {
             setIsFormOpen(false);
             fetchNetworks();
         } catch (error: any) {
-            addToast(error.message || 'Erreur lors de l\'enregistrement', 'error');
+            const message = error.response?.data?.message || error.message || 'Erreur lors de l\'enregistrement';
+            addToast(message, 'error');
             console.error('Failed to save network:', error);
         } finally {
             setIsSubmitting(false);

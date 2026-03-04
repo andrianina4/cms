@@ -4,6 +4,7 @@ export interface CategoryModel {
     slug: string;
     description: string;
     color: string;
+    articleCount?: number;
 }
 
 export interface CreateCategoryDTO {

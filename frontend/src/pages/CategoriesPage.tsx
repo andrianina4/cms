@@ -50,7 +50,8 @@ export function CategoriesPage() {
                 addToast('Catégorie supprimée avec succès', 'success');
                 fetchCategories();
             } catch (error: any) {
-                addToast(error.message || 'Erreur lors de la suppression', 'error');
+                const message = error.response?.data?.message || error.message || 'Erreur lors de la suppression';
+                addToast(message, 'error');
                 console.error('Failed to delete category:', error);
             }
         }
@@ -69,7 +70,8 @@ export function CategoriesPage() {
             setIsFormOpen(false);
             fetchCategories();
         } catch (error: any) {
-            addToast(error.message || 'Erreur lors de l\'enregistrement', 'error');
+            const message = error.response?.data?.message || error.message || 'Erreur lors de l\'enregistrement';
+            addToast(message, 'error');
             console.error('Failed to save category:', error);
         } finally {
             setIsSubmitting(false);

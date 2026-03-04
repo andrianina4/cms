@@ -17,6 +17,7 @@ import { cn } from '../lib/utils';
 import { Badge } from '../components/ui/badge';
 import { Button } from '../components/ui/button';
 import { useAuthStore, useToastStore } from '../store';
+import * as React from 'react';
 
 export function NotificationsPage() {
     const queryClient = useQueryClient();
@@ -52,6 +53,19 @@ export function NotificationsPage() {
         queryKey: ['notifications'],
         queryFn: notificationsService.getAll,
     });
+
+    // Auto-fill subject when article changes
+    React.useEffect(() => {
+        if (formData.articleId) {
+            const article = articlesData?.data.find((a: any) => a.id === formData.articleId);
+            if (article) {
+                reset({
+                    ...formData,
+                    subject: `📢 Nouvel article : ${article.title}`
+                });
+            }
+        }
+    }, [formData.articleId, articlesData, reset]);
 
     const articles = articlesData?.data || [];
     const notifications = (notificationsData?.data || []) as Notification[];
