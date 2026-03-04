@@ -1,13 +1,14 @@
 import express, { Request, Response } from "express";
+import { config } from "./config";
 
 const app = express();
-const PORT = 8080;
+const PORT = config.port;
 
 app.use(express.json());
 
 app.get("/", (_req: Request, res: Response) => {
     res.json({
-        message: "🚀 Backend Express opérationnel !",
+        message: "🚀 Backend Express opérationnelle !",
         port: PORT,
         timestamp: new Date().toISOString(),
     });
@@ -18,5 +19,5 @@ app.get("/health", (_req: Request, res: Response) => {
 });
 
 app.listen(PORT, () => {
-    console.log(`✅ Serveur démarré sur http://localhost:${PORT}`);
+    console.log(`✅ - Serveur démarré sur http://localhost:${PORT}`);
 });
