@@ -1,0 +1,62 @@
+[
+    {
+        "title": "Modern JavaScript Features 2026",
+        "content": "Exploring the latest ECMAScript features and how they impact development...",
+        "excerpt": "Stay ahead with the latest JS features.",
+        "author": "admin@taram.com",
+        "status": "published",
+        "categories": [
+            "Technology"
+        ],
+        "network": "Global Network",
+        "featured": true
+    },
+    {
+        "title": "UX Principles for Enterprise Apps",
+        "content": "Enterprise applications require a specific approach to UX that prioritizes efficiency...",
+        "excerpt": "The core of enterprise design.",
+        "author": "editor@taram.com",
+        "status": "published",
+        "categories": [
+            "Design"
+        ],
+        "network": "Europe Network",
+        "featured": false
+    },
+    {
+        "title": "Building Resilient APIs",
+        "content": "How to design APIs that can handle failures gracefully and scale efficiently...",
+        "excerpt": "Design for scale and reliability.",
+        "author": "admin@taram.com",
+        "status": "draft",
+        "categories": [
+            "Technology"
+        ],
+        "network": "Global Network",
+        "featured": false
+    },
+    {
+        "title": "The Impact of Remote Work on Culture",
+        "content": "Analyzing how remote work transforms long-term organizational culture...",
+        "excerpt": "Culture in a distributed world.",
+        "author": "editor@taram.com",
+        "status": "published",
+        "categories": [
+            "Society"
+        ],
+        "network": "Global Network",
+        "featured": false
+    },
+    {
+        "title": "Minimalist Design Trends",
+        "content": "Why minimalism continues to dominate modern interface design...",
+        "excerpt": "Less is truly more.",
+        "author": "editor@taram.com",
+        "status": "archived",
+        "categories": [
+            "Design"
+        ],
+        "network": "Europe Network",
+        "featured": false
+    }
+]
