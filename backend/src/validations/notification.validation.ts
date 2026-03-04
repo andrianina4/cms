@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const notificationSchema = z.object({
-    articleId: z.string().min(1, "L'ID de l'article est requis"),
-    recipients: z.string().min(1, "Au moins un destinataire est requis"),
-    subject: z.string().min(5, "Le sujet est requis"),
+    articleId: z.string().min(1, "Veuillez sélectionner un article"),
+    recipients: z.string().min(1, "Veuillez saisir au moins un destinataire"),
+    subject: z.string().min(5, "Le sujet doit faire au moins 5 caractères"),
 });

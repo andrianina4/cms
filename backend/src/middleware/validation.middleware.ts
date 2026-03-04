@@ -10,13 +10,18 @@ export const validate = (schema: ZodTypeAny) => {
         } catch (error) {
             console.error("[VALIDATION ERROR]:", error);
             if (error instanceof ZodError) {
-                const zodErr = error as any;
-                const issuesArray = zodErr.issues || zodErr.errors || [];
+                const issuesArray = error.issues || [];
                 const errors = issuesArray.map((err: any) => ({
                     path: err.path?.join(".") || '',
                     message: err.message,
                 }));
-                return sendError(res, "Validation failed", 400, { errors });
+
+                // more explicit main message containing first error
+                const mainMessage = issuesArray.length > 0
+                    ? `Erreur de validation: ${issuesArray[0].message}`
+                    : "Validation failed";
+
+                return sendError(res, mainMessage, 400, { errors });
             }
             return sendError(res, "Internal server error during validation", 500);
         }

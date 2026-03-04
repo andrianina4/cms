@@ -1,10 +1,10 @@
 import { z } from "zod";
 
 export const categorySchema = z.object({
-    name: z.string().min(2, "Le nom est requis"),
-    slug: z.string().min(2, "Le slug est requis"),
-    description: z.string().min(5, "La description est requise"),
-    color: z.string().regex(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/, "Couleur invalide"),
+    name: z.string().min(2, "Le nom doit faire au moins 2 caractères"),
+    slug: z.string().min(2, "Le slug doit faire au moins 2 caractères"),
+    description: z.string().optional(),
+    color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, "Couleur hexadécimale invalide"),
 });
 
 export const updateCategorySchema = categorySchema.partial();
