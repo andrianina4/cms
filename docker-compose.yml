@@ -1,11 +1,22 @@
 services:
+  nginx:
+    image: nginx:alpine
+    container_name: taram-proxy
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - frontend
+      - backend
+    restart: unless-stopped
+
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
     container_name: taram-backend
-    ports:
-      - "8080:8080"
+    # ports: - "8080:8080" # No longer exposed directly
     environment:
       - NODE_ENV=production
       - SMTP_HOST=maildev
@@ -23,13 +34,11 @@ services:
     restart: unless-stopped
 
   frontend:
-
     build:
       context: ./frontend
       dockerfile: Dockerfile
     container_name: taram-frontend
-    ports:
-      - "3000:80"
+    # ports: - "3000:80" # No longer exposed directly
     depends_on:
       - backend
     restart: unless-stopped

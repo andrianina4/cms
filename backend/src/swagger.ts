@@ -12,8 +12,12 @@ const options = {
         },
         servers: [
             {
+                url: '/api',
+                description: 'Production (via Nginx Proxy)',
+            },
+            {
                 url: `http://localhost:${config.port}`,
-                description: 'Development server',
+                description: 'Direct Backend (Local Dev)',
             },
         ],
         components: {

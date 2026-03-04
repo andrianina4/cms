@@ -1,173 +1,121 @@
-# TARAM CMS
+# TARAM CMS - Plateforme Éditoriale Headless
 
-TARAM est une plateforme éditoriale complète (Headless CMS) permettant la gestion d'articles, de catégories, de réseaux de diffusion et l'envoi de notifications par email.
+## Description
+TARAM est un CMS Headless moderne conçu pour simplifier la gestion de contenus multi-réseaux. Il permet aux administrateurs de gérer des articles, des catégories et des réseaux de diffusion, tout en offrant un système de notifications par email et un outil d'importation massive. L'architecture sépare strictement le Frontend (React) du Backend (Node/Express) pour une flexibilité maximale.
 
-Le projet est composé d'une interface d'administration moderne (Frontend React) et d'une API robuste (Backend Node.js).
+## Prérequis
+- **Node.js** : v20 ou supérieure (recommandé v20.x)
+- **npm** : v10 ou supérieure
+- **Docker & Docker Compose** : Recommandé pour un lancement rapide et une stack complète.
 
----
+## Installation
 
-## 🚀 Fonctionnalités Principales
-
-*   **Gestion d'Articles** : Création, modification, archivage, et publication d'articles avec un éditeur de texte riche et prévisualisation en temps réel.
-- 📊 **Dashboard Analytique** : Statistiques en temps réel, graphiques de répartition et derniers articles.
-- 🔐 **Gestion des Rôles (RBAC)** : Système complet Admin vs Éditeur avec restrictions d'accès backend et UI adaptive.
-- 📦 **Import Bulk** : Importation massive d'articles via fichiers JSON (Admin uniquement).
-- 📧 **Notifications** : Système d'envoi d'emails pour les nouvelles publications avec historique.
-- 📑 **Documentation API** : Documentation interactive via Swagger/OpenAPI.
-
----
-
-## 🛠️ Stack Technique
-
-### Frontend
-*   **Framework** : React + Vite
-*   **Langage** : TypeScript
-*   **Style** : Tailwind CSS, shadcn/ui
-*   **State Management** : Zustand, TanStack Query (React Query)
-*   **Formulaires** : React Hook Form, Zod (validation)
-*   **Iconographie** : Lucide React
-
-### Backend
-*   **Serveur** : Node.js, Express.js
-*   **Langage** : TypeScript
-*   **Base de données** : SQLite (via libSQL)
-*   **ORM** : Prisma
-*   **Validation** : Zod (middleware custom)
-*   **Documentation API** : Swagger (`swagger-ui-express`)
-
----
-
-## 📦 Architecture du Projet
-
-```text
-taram/
-│
-├── frontend/               # Application React (UI d'administration)
-│   ├── src/
-│   │   ├── components/     # Composants réutilisables (UI, Articles, Categories...)
-│   │   ├── pages/          # Pages principales (Dashboard, Articles list, Edit, etc.)
-│   │   ├── services/       # Appels API (Axios)
-│   │   ├── store/          # État global (Zustand)
-│   │   └── types/          # Définitions TypeScript
-│   └── package.json
-│
-├── backend/                # API Express
-│   ├── prisma/             # Schéma de base de données et Seeders
-│   ├── src/
-│   │   ├── controllers/    # Logique métier des routes
-│   │   ├── middleware/     # Middlewares (ex: validation Zod, Auth)
-│   │   ├── models/         # Interfaces TypeScript
-│   │   ├── repositories/   # Couche d'accès aux données (Prisma)
-│   │   ├── routes/         # Définition des endpoints API
-│   │   ├── services/       # Logique applicative complexe
-│   │   └── validations/    # Schémas Zod pour la validation des requêtes
-│   ├── .env                # Variables d'environnement
-│   └── package.json
-│
-└── docker-compose.yml      # Configuration Docker pour lancer la stack complète
+### 1. Cloner le projet
+```bash
+git clone git@github.com:andrianina4/cms.git
+cd taram
 ```
 
----
+### 2. Configuration des variables d'environnement
+Copiez les fichiers d'exemple pour le backend :
+```bash
+cp backend/.env.example backend/.env
+```
 
-## 🚦 Démarrage Rapide
+## 🚀 Lancement du projet
 
-### Prérequis
-*   Node.js (v18+)
-*   Docker & Docker Compose (Optionnel, pour le lancement conteneurisé)
+Vous pouvez lancer le projet de deux manières différentes selon vos besoins.
 
-### Option 1 : Via Docker (Recommandé)
-
-Lancez l'ensemble de la stack (Frontend + Backend) avec une seule commande :
+### Option A : Via Docker (Recommandé)
+C'est la méthode la plus rapide pour avoir la stack complète (Front, Back, DB, Proxy, Maildev) prête à l'emploi.
 
 ```bash
 docker-compose up --build
 ```
+- **Interface Admin** : [http://localhost](http://localhost)
+- **API Swagger** : [http://localhost/api-docs](http://localhost/api-docs)
+- **Maildev (Emails)** : [http://localhost:1080](http://localhost:1080)
 
-*   Le **Frontend** sera accessible sur : `http://localhost:5173`
-*   L'**API Backend** sera accessible sur : `http://localhost:8080/api`
-*   La **Documentation Swagger** sera sur : `http://localhost:8080/api-docs`
-*   🌍 **Visualisation des Emails (Maildev)** : `http://localhost:1080`
+### Option B : Lancement manuel (Développement)
+Utile si vous souhaitez modifier le code et voir les changements instantanément sans reconstruire les containers.
 
----
-
-### 📧 Visualisation des Emails (Développement)
-
-Pour tester l'envoi d'emails en local sans configurer de compte réel, nous utilisons **Maildev**. 
-- En mode Docker (`docker-compose up`), les emails envoyés par le backend sont automatiquement capturés.
-- Accédez à l'interface via : **[http://localhost:1080](http://localhost:1080)**
-
----
-
-#### 🔐 Simulation des Rôles (RBAC)
-
-
-Pour faciliter les tests, le système inclus une simulation de rôles dans le Header :
-- **Admin** : Accès total (Suppression, Import, Gestion des catégories/réseaux, Notifications).
-- **Editor** : Accès restreint (Lecture seule sur la structure, création/édition d'articles uniquement, pas de suppression).
-
-Les requêtes API incluent automatiquement le header `x-user-role` pour validation côté serveur.
-
-### 📖 Documentation API
-
-La documentation Swagger est disponible une fois le backend lancé :
-- **URL** : `http://localhost:8080/api-docs`
-- **Authentification** : 
-    - Cliquez sur le bouton **"Authorize"** en haut à droite.
-    - Saisissez `admin` ou `editor` dans le champ de texte.
-    - Toutes les requêtes suivantes incluront automatiquement le header `x-user-role` avec cette valeur.
-- **Format** : OpenAPI 3.0
-
-### Option 2 : Lancement Local (Développement)
-
-#### 1. Configuration du Backend
-
+#### 1. Backend
 ```bash
 cd backend
 npm install
-
-# Copier le fichier d'environnement (si fourni) ou référez-vous à .env.example
-# Lancer les migrations, le seeder et le serveur de dev
 npm run dev
 ```
-> Le backend tourne sur `http://localhost:8080`
+*Le backend sera accessible sur [http://localhost:8080](http://localhost:8080).*
 
-#### 2. Configuration du Frontend
-
-Dans un nouveau terminal :
-
+#### 2. Frontend
 ```bash
 cd frontend
 npm install
-
-# Lancer le serveur de développement Vite
 npm run dev
 ```
-> Le frontend tourne sur `http://localhost:5173`
+*Le frontend sera accessible sur [http://localhost:5173](http://localhost:5173).*
 
----
-
-## 📚 Documentation de l'API (Swagger)
-
-Une fois le backend lancé, la documentation interactive de l'API est générée automatiquement.
-Rendez-vous sur : **[http://localhost:8080/api-docs](http://localhost:8080/api-docs)**
-
-Vous pourrez y tester toutes les routes disponibles (`/api/articles`, `/api/categories`, etc.) directement depuis votre navigateur.
-
----
-
-## 🔒 Variables d'environnement
-
-### Backend (`backend/.env`)
-```env
-PORT=8080
-DATABASE_URL="file:./dev.db"  # SQLite par défaut
+#### 3. Maildev (Optionnel)
+Pour tester l'envoi d'emails sans Docker, vous pouvez utiliser Maildev globalement :
+```bash
+npx maildev
 ```
 
-### Frontend (`frontend/.env`)
-```env
-VITE_API_URL="http://localhost:8080/api"
+## Choix techniques
+
+### Architecture
+- **Layered Architecture & Repository Pattern (Backend)** : Utilisation du design pattern **Repository** pour découpler la logique métier de la persistance des données. Cela permet de changer d'ORM ou de base de données sans impacter les services.
+- **Service Layer** : Toute la logique complexe (ex: envoi d'emails, import JSON) est isolée dans des services dédiés pour faciliter la réutilisation et le test.
+- **Zustand (Frontend)** : Choix de Zustand pour sa légèreté par rapport à Redux, parfait pour gérer l'auth et l'UI sans boilerplate complexe en un temps record.
+
+### Technologies
+- **SQLite + Prisma** : Pour un test technique, SQLite est idéal (zéro config). Prisma apporte un typage fort de bout en bout.
+- **Nginx (Reverse Proxy)** : Utilisé pour unifier l'accès au projet sur le port 80, simulant un environnement de production réel.
+- **Zod** : Validation stricte des contrats d'API et des formulaires frontend, garantissant l'intégrité des données.
+- **Nodemailer + Maildev** : Permet de tester l'envoi d'emails réels de manière visuelle en local.
+
+### Compromis
+- **Auth Simulation** : Le système utilise une simulation de rôle via des headers (`x-user-role`) pour permettre de tester les permissions sans avoir à gérer un système de JWT complet (gain de temps focus sur les fonctionnalités métier).
+- **SQLite** : Suffisant pour ce test, mais nécessiterait PostgreSQL pour une mise en production avec forte charge.
+
+## Fonctionnalités implémentées
+
+| Fonctionnalité | Statut | Description |
+| :--- | :---: | :--- |
+| **Gestion Articles** | ✅ Complet | CRUD Complet, Publication, Archivage, Filtres. |
+| **Dashboard** | ✅ Complet | Statistiques dynamiques et derniers articles. |
+| **Import Massive** | ✅ Complet | Import de fichiers JSON avec validation syntaxique. |
+| **Notifications** | ✅ Complet | Envoi d'emails réels (via Nodemailer) avec historique. |
+| **RBAC (Rôles)** | ✅ Complet | Différenciation Admin vs Éditeur (UI + Backend). |
+| **Reverse Proxy** | ✅ Complet | Accès unifié sur port 80 via Nginx. |
+| **Swagger** | ✅ Complet | Documentation interactive auto-générée. |
+
+## Ce qui aurait été fait avec plus de temps
+1. **Authentification Réelle** : Implémentation de JWT avec Refresh Tokens et cryptage de mots de passe.
+2. **Éditeur Riche** : Intégration d'un éditeur de type TipTap ou Quill pour les articles.
+3. **Tests E2E** : Ajout de tests avec Playwright pour valider les flux critiques (Import -> Publication).
+4. **Optimisation Image** : Système de stockage S3/Cloudinary pour les images d'articles.
+
+## 🧪 Tests Unitaires
+Le projet inclut une suite de tests unitaires pour le backend utilisant **Vitest**.
+
+```bash
+cd backend
+npm test                # Exécuter les tests
+npm run test:coverage   # Voir la couverture de code
 ```
 
-## 🤝 Contribution
+La logique métier des services (Articles, Catégories, Notifications) est couverte à plus de 80%.
 
-Les modifications de la base de données nécessitent de mettre à jour le schéma Prisma (`backend/prisma/schema.prisma`) puis d'exécuter `npm run db:push` dans le dossier backend.
+## 💎 Bonus de ce Projet
+
+Pour aller au-delà des attentes de base du test, j'ai implémenté :
+1. **Documentation API Swagger** : Une interface interactive pour tester tous les endpoints.
+2. **Reverse Proxy Nginx** : Tout le projet est accessible sur le port 80, comme en production.
+3. **Conteneurisation Docker** : L'intégralité de la stack (Front, Back, Proxy, DB) se lance en une commande.
+4. **Visualisation d'Emails** : Intégration de Maildev pour intercepter et visualiser les emails en local.
+
+## Difficultés rencontrées
+- **Contrainte de Temps (4h)** : Développer une stack complète (Front + Back + DB + Docker + Proxy) en 4h impose des choix radicaux, notamment sur la simulation de l'authentification et l'utilisation de SQLite.
+- **Intégration Docker/Nginx** : La gestion des chemins relatifs pour le proxy Nginx et le Swagger a nécessité des ajustements sur le base URL du backend pour que les assets Swagger chargent correctement derrière `/api-docs`.
+- **Validation Zod en Array** : La validation des imports massifs d'articles a posé des défis sur la précision des messages d'erreurs pour l'utilisateur (corrigé via un middleware custom).
