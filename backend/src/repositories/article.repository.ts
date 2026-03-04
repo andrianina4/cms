@@ -18,7 +18,6 @@ export interface IArticleRepository {
 
 export class ArticleRepository implements IArticleRepository {
     private readonly include = {
-        author: { select: { id: true, email: true, role: true } },
         categories: true,
         network: true
     };

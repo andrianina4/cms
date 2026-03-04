@@ -10,6 +10,8 @@ import {
     CheckCircle2
 } from 'lucide-react';
 import { articlesService } from '../services/articles.service';
+import { categoriesService } from '../services/categories.service';
+import { networksService } from '../services/networks.service';
 import { DataTable } from '../components/common/DataTable';
 import { ArticleFilters } from '../components/articles/ArticleFilters';
 import { ArticleStatusBadge } from '../components/articles/ArticleStatusBadge';
@@ -22,21 +24,36 @@ export function ArticlesPage() {
     const queryClient = useQueryClient();
     const [selectedArticles, setSelectedArticles] = React.useState<Article[]>([]);
 
+    // Fetch filters data
+    const { data: categories = [] } = useQuery({
+        queryKey: ['categories'],
+        queryFn: categoriesService.getAll,
+    });
+
+    const { data: networks = [] } = useQuery({
+        queryKey: ['networks'],
+        queryFn: networksService.getAll,
+    });
+
     // States for filters
     const [search, setSearch] = React.useState('');
     const [status, setStatus] = React.useState('');
+    const [categoryIds, setCategoryIds] = React.useState<string[]>([]);
+    const [networkId, setNetworkId] = React.useState('');
     const [featured, setFeatured] = React.useState(false);
     const [page, setPage] = React.useState(0);
     const limit = 20;
 
     // Fetch articles
     const { data, isLoading } = useQuery({
-        queryKey: ['articles', { page, search, status, featured }],
+        queryKey: ['articles', { page, search, status, categoryIds, networkId, featured }],
         queryFn: () => articlesService.getAll({
             page: page + 1,
             limit,
             search,
             status,
+            categoryIds,
+            networkId,
             featured
         }),
     });
@@ -157,7 +174,11 @@ export function ArticlesPage() {
             <ArticleFilters
                 onSearch={setSearch}
                 onStatusChange={setStatus}
+                onCategoryChange={setCategoryIds}
+                onNetworkChange={setNetworkId}
                 onFeaturedToggle={setFeatured}
+                categories={categories}
+                networks={networks}
             />
 
             {/* Bulk Actions Bar */}

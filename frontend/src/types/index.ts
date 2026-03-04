@@ -26,7 +26,7 @@ export interface Article {
     categories: Category[];
     networkId: string;
     network: Network;
-    authorId: string;
+    author: string;
     createdAt: string;
     updatedAt: string;
 }

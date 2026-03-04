@@ -5,10 +5,22 @@ import * as React from 'react';
 interface ArticleFiltersProps {
     onSearch: (value: string) => void;
     onStatusChange: (status: string) => void;
+    onCategoryChange: (ids: string[]) => void;
+    onNetworkChange: (id: string) => void;
     onFeaturedToggle: (featured: boolean) => void;
+    categories?: any[];
+    networks?: any[];
 }
 
-export function ArticleFilters({ onSearch, onStatusChange, onFeaturedToggle }: ArticleFiltersProps) {
+export function ArticleFilters({
+    onSearch,
+    onStatusChange,
+    onCategoryChange,
+    onNetworkChange,
+    onFeaturedToggle,
+    categories = [],
+    networks = []
+}: ArticleFiltersProps) {
     const [searchValue, setSearchValue] = React.useState('');
     const [isFeatured, setIsFeatured] = React.useState(false);
 
@@ -53,15 +65,23 @@ export function ArticleFilters({ onSearch, onStatusChange, onFeaturedToggle }: A
                 </div>
 
                 <div className="relative group">
-                    <select className="appearance-none bg-white border border-slate-100 rounded-2xl py-3 pl-5 pr-12 text-sm font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all shadow-sm cursor-pointer">
-                        <option>Toutes catégories</option>
+                    <select
+                        onChange={(e) => onCategoryChange(e.target.value ? [e.target.value] : [])}
+                        className="appearance-none bg-white border border-slate-100 rounded-2xl py-3 pl-5 pr-12 text-sm font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all shadow-sm cursor-pointer"
+                    >
+                        <option value="">Toutes catégories</option>
+                        {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                     </select>
                     <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
                 </div>
 
                 <div className="relative group">
-                    <select className="appearance-none bg-white border border-slate-100 rounded-2xl py-3 pl-5 pr-12 text-sm font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all shadow-sm cursor-pointer">
-                        <option>Tous réseaux</option>
+                    <select
+                        onChange={(e) => onNetworkChange(e.target.value)}
+                        className="appearance-none bg-white border border-slate-100 rounded-2xl py-3 pl-5 pr-12 text-sm font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all shadow-sm cursor-pointer"
+                    >
+                        <option value="">Tous réseaux</option>
+                        {networks.map(n => <option key={n.id} value={n.id}>{n.name}</option>)}
                     </select>
                     <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
                 </div>

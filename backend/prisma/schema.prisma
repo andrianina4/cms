@@ -15,7 +15,6 @@ model User {
   email     String    @unique
   password  String
   role      String    @default("editor") // "admin" | "editor"
-  articles  Article[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 }
@@ -25,8 +24,7 @@ model Article {
   title       String
   content     String
   excerpt     String
-  authorId    String
-  author      User      @relation(fields: [authorId], references: [id])
+  author      String
   categories  Category[] @relation("ArticleToCategory")
   networkId   String
   network     Network   @relation(fields: [networkId], references: [id])

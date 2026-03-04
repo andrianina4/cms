@@ -1,4 +1,3 @@
-import { UserModel } from "./user.model";
 import { CategoryModel } from "./category.model";
 import { NetworkModel } from "./network.model";
 
@@ -9,8 +8,7 @@ export interface ArticleModel {
     title: string;
     content: string;
     excerpt: string;
-    authorId: string;
-    author?: UserModel;
+    author: string;
     categories?: CategoryModel[];
     networkId: string;
     network?: NetworkModel;
@@ -25,7 +23,7 @@ export interface CreateArticleDTO {
     title: string;
     content: string;
     excerpt: string;
-    authorId: string;
+    author: string;
     networkId: string;
     status?: ArticleStatus;
     featured?: boolean;

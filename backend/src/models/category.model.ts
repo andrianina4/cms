@@ -5,3 +5,17 @@ export interface CategoryModel {
     description: string;
     color: string;
 }
+
+export interface CreateCategoryDTO {
+    name: string;
+    slug: string;
+    description: string;
+    color: string;
+}
+
+export interface UpdateCategoryDTO {
+    name?: string;
+    slug?: string;
+    description?: string;
+    color?: string;
+}

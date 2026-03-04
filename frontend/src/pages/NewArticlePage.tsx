@@ -14,7 +14,6 @@ import { networksService } from '../services/networks.service';
 import { articlesService } from '../services/articles.service';
 import { CategoryPicker } from '../components/articles/CategoryPicker';
 import { cn } from '../lib/utils';
-import * as React from 'react';
 
 export function NewArticlePage() {
     const navigate = useNavigate();
@@ -36,6 +35,7 @@ export function NewArticlePage() {
         handleSubmit,
         watch,
         control,
+        setValue,
         formState: { errors, isValid }
     } = useForm({
         resolver: zodResolver(articleSchema),
@@ -61,6 +61,11 @@ export function NewArticlePage() {
         createMutation.mutate(data);
     };
 
+    const handleSaveAs = (status: 'draft' | 'published' | 'archived') => {
+        setValue('status', status);
+        handleSubmit(onSubmit)();
+    };
+
     return (
         <div className="max-w-[1600px] mx-auto">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
@@ -82,12 +87,15 @@ export function NewArticlePage() {
 
                         <button
                             type="button"
-                            className="px-6 py-2.5 rounded-xl border border-slate-200 text-slate-600 font-bold text-sm hover:bg-white hover:border-slate-300 transition-all shadow-sm"
+                            onClick={() => handleSaveAs('draft')}
+                            disabled={createMutation.isPending}
+                            className="px-6 py-2.5 rounded-xl border border-slate-200 text-slate-600 font-bold text-sm hover:bg-white hover:border-slate-300 transition-all shadow-sm flex items-center gap-2"
                         >
                             Sauvegarder brouillon
                         </button>
                         <button
-                            type="submit"
+                            type="button"
+                            onClick={() => handleSaveAs('published')}
                             disabled={!isValid || createMutation.isPending}
                             className="bg-amber-100 hover:bg-amber-200 disabled:opacity-50 disabled:cursor-not-allowed text-amber-900 px-8 py-2.5 rounded-xl font-bold text-sm flex items-center gap-2 transition-all shadow-sm shadow-amber-50"
                         >
@@ -126,12 +134,18 @@ export function NewArticlePage() {
                             </div>
 
                             <div className="grid grid-cols-2 gap-6">
-                                {/* Auteur Mock (Non modifiable pour l'instant) */}
+                                {/* Auteur */}
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Auteur</label>
-                                    <div className="w-full bg-slate-50 border border-slate-100 rounded-2xl py-4 px-5 text-sm font-bold text-slate-400 italic">
-                                        Utilisateur actuel
-                                    </div>
+                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Auteur *</label>
+                                    <input
+                                        {...register('author')}
+                                        placeholder="Nom de l'auteur"
+                                        className={cn(
+                                            "w-full bg-white border rounded-2xl py-4 px-5 text-sm font-medium focus:outline-none transition-all shadow-sm",
+                                            errors.author ? "border-red-200 focus:ring-red-500/10 focus:border-red-500" : "border-slate-100 focus:ring-indigo-500/10 focus:border-indigo-500"
+                                        )}
+                                    />
+                                    {errors.author && <p className="text-[10px] font-bold text-red-500 uppercase tracking-wider">{errors.author.message as string}</p>}
                                 </div>
 
                                 {/* Réseau */}
@@ -181,6 +195,7 @@ export function NewArticlePage() {
                                         >
                                             <option value="draft">Brouillon</option>
                                             <option value="published">Publié</option>
+                                            <option value="archived">Archivé</option>
                                         </select>
                                         <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                                     </div>
@@ -271,8 +286,10 @@ export function NewArticlePage() {
                                         <Layout className="w-5 h-5" />
                                     </div>
                                     <div>
-                                        <div className="text-xs font-bold text-slate-900">Auteur</div>
-                                        <div className="text-[11px] text-slate-400 font-medium">Article {formData.status === 'draft' ? 'en brouillon' : 'publié'}</div>
+                                        <div className="text-xs font-bold text-slate-900">{formData.author || 'Auteur'}</div>
+                                        <div className="text-[11px] text-slate-400 font-medium">
+                                            Article {formData.status === 'draft' ? 'en brouillon' : formData.status === 'published' ? 'publié' : 'archivé'}
+                                        </div>
                                     </div>
                                 </div>
 
