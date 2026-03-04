@@ -1,19 +1,34 @@
 // ─── Global Types ────────────────────────────────────────────────────────────
 
-export interface Article {
-    id: number;
-    title: string;
-    content: string;
-    categoryId: number;
-    authorId: number;
-    createdAt: string;
-    updatedAt: string;
-}
+export type ArticleStatus = 'draft' | 'published' | 'archived';
 
 export interface Category {
-    id: number;
+    id: string;
     name: string;
+    slug: string;
     description?: string;
+    color: string;
+}
+
+export interface Network {
+    id: string;
+    name: string;
+    description: string;
+}
+
+export interface Article {
+    id: string;
+    title: string;
+    content: string;
+    excerpt: string;
+    status: ArticleStatus;
+    featured: boolean;
+    categories: Category[];
+    networkId: string;
+    network: Network;
+    authorId: string;
+    createdAt: string;
+    updatedAt: string;
 }
 
 export interface Notification {

@@ -20,14 +20,16 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@prisma/client": "^7.4.2",
+    "@libsql/client": "^0.17.0",
+    "@prisma/adapter-libsql": "^7.4.2",
+    "@prisma/client": "^6.19.2",
     "dotenv": "^17.3.1",
     "express": "^5.2.1"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",
     "@types/node": "^25.3.3",
-    "prisma": "^7.4.2",
+    "prisma": "^6.19.2",
     "ts-node-dev": "^2.0.0"
   }
 }

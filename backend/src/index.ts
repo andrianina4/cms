@@ -1,23 +1,18 @@
 import express, { Request, Response } from "express";
 import { config } from "./config";
+import articleRoutes from "./routes/article.routes";
 
 const app = express();
 const PORT = config.port;
 
 app.use(express.json());
 
-app.get("/", (_req: Request, res: Response) => {
-    res.json({
-        message: "🚀 Backend Express opérationnelle !",
-        port: PORT,
-        timestamp: new Date().toISOString(),
-    });
-});
+app.use("/api/articles", articleRoutes);
 
 app.get("/health", (_req: Request, res: Response) => {
     res.json({ status: "ok" });
 });
 
 app.listen(PORT, () => {
-    console.log(`✅ - Serveur démarré sur http://localhost:${PORT}`);
+    console.log(`Serveur démarré sur 0.0.0.0:${PORT}`);
 });
