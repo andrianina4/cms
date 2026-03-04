@@ -8,6 +8,7 @@ import { NotificationsPage } from './pages/NotificationsPage';
 import { ImportPage } from './pages/ImportPage';
 
 import { EditArticlePage } from './pages/EditArticlePage';
+import { NetworksPage } from './pages/NetworksPage';
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
           <Route path="/articles/new" element={<NewArticlePage />} />
           <Route path="/articles/:id/edit" element={<EditArticlePage />} />
           <Route path="/categories" element={<CategoriesPage />} />
+          <Route path="/networks" element={<NetworksPage />} />
           <Route path="/notifications" element={<NotificationsPage />} />
           <Route path="/import" element={<ImportPage />} />
           {/* Fallback to dashboard */}

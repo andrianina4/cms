@@ -8,7 +8,9 @@ export class ArticleService {
         page?: number;
         limit?: number;
         status?: string;
-        network?: string;
+        networkId?: string;
+        categoryIds?: string[];
+        featured?: boolean;
         search?: string;
     }): Promise<{ items: ArticleModel[]; total: number }> {
         return this.articleRepository.findAll(params);

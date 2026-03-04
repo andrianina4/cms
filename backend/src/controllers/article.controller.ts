@@ -8,17 +8,26 @@ export class ArticleController {
 
     getAll = async (req: Request, res: Response) => {
         try {
-            const { page, limit, status, network, search } = req.query;
+            console.log("DEBUG: Controller received query:", req.query);
+            const { page, limit, status, networkId, search, categoryIds, featured } = req.query;
+            const categoryIdsBrackets = req.query['categoryIds[]'];
+            const finalCategoryIds = categoryIds || categoryIdsBrackets;
+
             const pageNum = page ? parseInt(page as string) : 1;
             const limitNum = limit ? parseInt(limit as string) : 10;
 
-            const result = await this.articleService.getAllArticles({
+            const filterParams = {
                 page: pageNum,
                 limit: limitNum,
                 status: status as string,
-                network: network as string,
+                networkId: networkId as string,
                 search: search as string,
-            });
+                categoryIds: Array.isArray(finalCategoryIds) ? finalCategoryIds as string[] : finalCategoryIds ? [finalCategoryIds as string] : undefined,
+                featured: featured === 'true' ? true : undefined
+            };
+            console.log("DEBUG: Final filter params sent to service:", filterParams);
+
+            const result = await this.articleService.getAllArticles(filterParams);
 
             return sendSuccess(res, result.items, "Articles retrieved successfully", 200, {
                 total: result.total,

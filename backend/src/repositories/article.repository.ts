@@ -7,7 +7,9 @@ export interface IArticleRepository {
         page?: number;
         limit?: number;
         status?: string;
-        network?: string;
+        networkId?: string;
+        categoryIds?: string[];
+        featured?: boolean;
         search?: string;
     }): Promise<{ items: ArticleModel[]; total: number }>;
     findById(id: string): Promise<ArticleModel | null>;
@@ -26,22 +28,35 @@ export class ArticleRepository implements IArticleRepository {
         page?: number;
         limit?: number;
         status?: string;
-        network?: string;
+        networkId?: string;
+        categoryIds?: string[];
+        featured?: boolean;
         search?: string;
     }) {
-        const { page = 1, limit = 10, status, network, search } = params;
+        const { page = 1, limit = 10, status, networkId, categoryIds, featured, search } = params;
         const skip = (page - 1) * limit;
 
-        // On utilise un type lâche pour 'where' en cas de soucis de Namespace avec PrismaWhereInput
         const where: any = {};
         if (status) where.status = status;
-        if (network) where.networkId = network;
+        if (networkId) where.networkId = networkId;
+        if (featured !== undefined) where.featured = featured;
+
+        if (categoryIds && categoryIds.length > 0) {
+            where.categories = {
+                some: {
+                    id: { in: categoryIds }
+                }
+            };
+        }
+
         if (search) {
             where.OR = [
                 { title: { contains: search } },
                 { content: { contains: search } }
             ];
         }
+
+        console.log("DEBUG: ArticleRepository where clause:", JSON.stringify(where, null, 2));
 
         const [items, total] = await Promise.all([
             prisma.article.findMany({

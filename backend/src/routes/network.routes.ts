@@ -9,5 +9,9 @@ const networkService = new NetworkService(networkRepository);
 const networkController = new NetworkController(networkService);
 
 router.get("/", networkController.getAll);
+router.get("/:id", networkController.getById);
+router.post("/", networkController.create);
+router.put("/:id", networkController.update);
+router.delete("/:id", networkController.delete);
 
 export default router;

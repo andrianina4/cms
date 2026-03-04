@@ -9,5 +9,7 @@ const notificationService = new NotificationService(notificationRepository);
 const notificationController = new NotificationController(notificationService);
 
 router.get("/", notificationController.getAll);
+router.post("/", notificationController.create);
+
 
 export default router;

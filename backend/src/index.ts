@@ -1,5 +1,6 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
+import morgan from "morgan";
 import { config } from "./config";
 import articleRoutes from "./routes/article.routes";
 import categoryRoutes from "./routes/category.routes";
@@ -11,6 +12,7 @@ const app = express();
 const PORT = config.port;
 
 app.use(cors());
+app.use(morgan("dev"));
 app.use(express.json());
 
 app.use("/api/articles", articleRoutes);

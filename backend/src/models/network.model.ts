@@ -3,3 +3,13 @@ export interface NetworkModel {
     name: string;
     description: string;
 }
+
+export interface CreateNetworkDTO {
+    name: string;
+    description: string;
+}
+
+export interface UpdateNetworkDTO {
+    name?: string;
+    description?: string;
+}

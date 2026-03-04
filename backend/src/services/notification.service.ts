@@ -7,4 +7,8 @@ export class NotificationService {
     async getAllNotifications(): Promise<NotificationModel[]> {
         return this.notificationRepository.findAll();
     }
+
+    async createNotification(data: Omit<NotificationModel, 'id' | 'sentAt' | 'status'>): Promise<NotificationModel> {
+        return this.notificationRepository.create(data);
+    }
 }

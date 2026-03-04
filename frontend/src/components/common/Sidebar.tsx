@@ -8,10 +8,11 @@ import {
     Upload,
     LogOut,
     ChevronLeft,
-    ChevronRight
+    ChevronRight,
+    Globe
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
-import { useUIStore } from '../../store';
+import { useUIStore, useAuthStore } from '../../store';
 
 const menuGroups = [
     {
@@ -26,7 +27,8 @@ const menuGroups = [
         label: 'GESTION',
         items: [
             { name: 'Catégories', icon: FolderTree, path: '/categories' },
-            { name: 'Notifications', icon: Bell, path: '/notifications', count: 3 },
+            { name: 'Réseaux', icon: Globe, path: '/networks' },
+            { name: 'Notifications', icon: Bell, path: '/notifications' },
             { name: 'Import JSON', icon: Upload, path: '/import' },
         ],
     },
@@ -35,6 +37,7 @@ const menuGroups = [
 export function Sidebar() {
     const location = useLocation();
     const { isSidebarOpen, toggleSidebar } = useUIStore();
+    const { user, logout } = useAuthStore();
 
     return (
         <>
@@ -141,21 +144,31 @@ export function Sidebar() {
                         !isSidebarOpen && "lg:p-2 lg:bg-transparent"
                     )}>
                         <div className="flex items-center gap-3 overflow-hidden">
-                            <div className="w-9 h-9 min-w-[36px] bg-purple-100 text-purple-700 rounded-xl flex items-center justify-center font-bold text-sm">
-                                A
+                            <div className={cn(
+                                "w-9 h-9 min-w-[36px] rounded-xl flex items-center justify-center font-bold text-sm",
+                                user?.role === 'admin' ? "bg-indigo-100 text-indigo-700" : "bg-purple-100 text-purple-700"
+                            )}>
+                                {user?.name.charAt(0) || 'U'}
                             </div>
                             <div className={cn(
                                 "transition-all duration-300 overflow-hidden",
                                 !isSidebarOpen && "lg:hidden opacity-0"
                             )}>
-                                <p className="text-sm font-bold text-slate-800 leading-tight whitespace-nowrap">Admin TARAM</p>
-                                <p className="text-xs text-slate-400 font-medium whitespace-nowrap">Administrateur</p>
+                                <p className="text-sm font-bold text-slate-800 leading-tight whitespace-nowrap">
+                                    {user?.name || 'Utilisateur'}
+                                </p>
+                                <p className="text-xs text-slate-400 font-medium whitespace-nowrap uppercase tracking-wider">
+                                    {user?.role || 'Visiteur'}
+                                </p>
                             </div>
                         </div>
-                        <button className={cn(
-                            "text-slate-300 hover:text-red-500 transition-colors",
-                            !isSidebarOpen && "lg:hidden"
-                        )}>
+                        <button
+                            onClick={() => logout()}
+                            className={cn(
+                                "text-slate-300 hover:text-red-500 transition-colors",
+                                !isSidebarOpen && "lg:hidden"
+                            )}
+                        >
                             <LogOut className="w-5 h-5" />
                         </button>
                     </div>

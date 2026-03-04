@@ -13,4 +13,13 @@ export class NotificationController {
             return sendError(res, error.message);
         }
     };
+
+    create = async (req: Request, res: Response) => {
+        try {
+            const notification = await this.notificationService.createNotification(req.body);
+            return sendSuccess(res, notification, "Notification sent successfully", 201);
+        } catch (error: any) {
+            return sendError(res, error.message);
+        }
+    };
 }
