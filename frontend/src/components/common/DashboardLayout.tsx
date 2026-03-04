@@ -1,6 +1,7 @@
 import { Outlet } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';
+import { ToastContainer } from './Toast';
 import { useUIStore } from '../../store';
 import { cn } from '../../lib/utils';
 
@@ -8,7 +9,7 @@ export function DashboardLayout() {
     const { isSidebarOpen } = useUIStore();
 
     return (
-        <div className="min-h-screen bg-slate-50/50 flex">
+        <div className="min-h-screen bg-slate-50/50 flex relative">
             <Sidebar />
             <div className={cn(
                 "flex-1 flex flex-col transition-all duration-300 ease-in-out",
@@ -21,6 +22,7 @@ export function DashboardLayout() {
                     </div>
                 </main>
             </div>
+            <ToastContainer />
         </div>
     );
 }

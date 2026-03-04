@@ -1,18 +1,67 @@
 import { useState, useRef } from 'react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
     Upload,
     FileJson,
     Download,
     AlertCircle,
-    FileSpreadsheet
+    FileSpreadsheet,
+    Loader2
 } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { Button } from '../components/ui/button';
+import { importService } from '../services/import.service';
+import type { ImportResult } from '../services/import.service';
+import { useToastStore } from '../store';
 
 export function ImportPage() {
     const [isDragging, setIsDragging] = useState(false);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const { addToast } = useToastStore();
+    const queryClient = useQueryClient();
+
+    const importMutation = useMutation({
+        mutationFn: async (file: File) => {
+            return new Promise<ImportResult>((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    try {
+                        const content = e.target?.result as string;
+                        const data = JSON.parse(content);
+                        if (!Array.isArray(data)) {
+                            throw new Error("Le fichier JSON doit contenir un tableau d'articles.");
+                        }
+                        const result = await importService.importArticles(data);
+                        resolve(result);
+                    } catch (error: any) {
+                        reject(error);
+                    }
+                };
+                reader.onerror = () => reject(new Error("Erreur lors de la lecture du fichier."));
+                reader.readAsText(file);
+            });
+        },
+        onSuccess: (data) => {
+            if (data.success > 0) {
+                queryClient.invalidateQueries({ queryKey: ['articles'] });
+                addToast(`${data.success} article(s) importé(s) avec succès.`, 'success');
+            }
+            if (data.failed > 0) {
+                addToast(`${data.failed} article(s) ont échoué. Vérifiez le console pour les détails.`, 'error');
+                console.error("Erreurs d'import:", data.errors);
+            }
+            setSelectedFile(null);
+            if (fileInputRef.current) {
+                fileInputRef.current.value = '';
+            }
+        },
+        onError: (error: any) => {
+            const message = error.response?.data?.message || error.message || "Erreur lors de l'importation";
+            addToast(message, 'error');
+            console.error(error);
+        }
+    });
 
     const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -27,9 +76,7 @@ export function ImportPage() {
 
     const handleImport = () => {
         if (!selectedFile) return;
-        console.log('Importing file:', selectedFile.name);
-        // Add actual API call here
-        alert(`Importation de ${selectedFile.name} lancée !`);
+        importMutation.mutate(selectedFile);
     };
 
     const jsonExample = [
@@ -140,14 +187,19 @@ export function ImportPage() {
 
                         {selectedFile && (
                             <Button
-                                className="rounded-xl px-8 py-2.5 bg-indigo-600 text-white font-bold text-sm hover:bg-indigo-700 flex items-center gap-2 shadow-lg shadow-indigo-100"
+                                className="rounded-xl px-8 py-2.5 bg-indigo-600 text-white font-bold text-sm hover:bg-indigo-700 flex items-center gap-2 shadow-lg shadow-indigo-100 disabled:opacity-50 disabled:cursor-not-allowed"
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     handleImport();
                                 }}
+                                disabled={importMutation.isPending}
                             >
-                                <Upload className="w-4 h-4" />
-                                Importer
+                                {importMutation.isPending ? (
+                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                ) : (
+                                    <Upload className="w-4 h-4" />
+                                )}
+                                {importMutation.isPending ? "Importation..." : "Importer"}
                             </Button>
                         )}
                     </div>

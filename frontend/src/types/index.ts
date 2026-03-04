@@ -56,3 +56,37 @@ export interface PaginatedResponse<T> extends ApiResponse<T[]> {
     page: number;
     limit: number;
 }
+
+export interface DashboardStats {
+    kpis: {
+        totalArticles: number;
+        publishedArticles: number;
+        publishedPercentage: number;
+        draftArticles: number;
+        totalNotifications: number;
+    };
+    articlesByCategory: {
+        name: string;
+        count: number;
+        color: string;
+    }[];
+    articlesByNetwork: {
+        name: string;
+        count: number;
+    }[];
+    recentArticles: {
+        id: string;
+        title: string;
+        status: string;
+        network: string;
+        date: string;
+    }[];
+    recentNotifications: {
+        id: string;
+        subject: string;
+        status: string;
+        articleTitle: string;
+        date: string;
+        recipientsCount: number;
+    }[];
+}
