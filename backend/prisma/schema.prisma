@@ -43,7 +43,7 @@ model Category {
   description String
   color       String
   articles    Article[] @relation("ArticleToCategory")
-}
+}   
 
 model Network {
   id          String    @id @default(cuid())

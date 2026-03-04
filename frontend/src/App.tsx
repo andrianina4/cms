@@ -7,6 +7,8 @@ import { CategoriesPage } from './pages/CategoriesPage';
 import { NotificationsPage } from './pages/NotificationsPage';
 import { ImportPage } from './pages/ImportPage';
 
+import { EditArticlePage } from './pages/EditArticlePage';
+
 function App() {
   return (
     <BrowserRouter>
@@ -15,6 +17,7 @@ function App() {
           <Route path="/" element={<DashboardPage />} />
           <Route path="/articles" element={<ArticlesPage />} />
           <Route path="/articles/new" element={<NewArticlePage />} />
+          <Route path="/articles/:id/edit" element={<EditArticlePage />} />
           <Route path="/categories" element={<CategoriesPage />} />
           <Route path="/notifications" element={<NotificationsPage />} />
           <Route path="/import" element={<ImportPage />} />

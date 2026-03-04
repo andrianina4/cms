@@ -15,14 +15,17 @@ import { networksService } from '../services/networks.service';
 import { DataTable } from '../components/common/DataTable';
 import { ArticleFilters } from '../components/articles/ArticleFilters';
 import { ArticleStatusBadge } from '../components/articles/ArticleStatusBadge';
+import { ArticlePreviewModal } from '../components/articles/ArticlePreviewModal';
 import type { Article } from '../types';
 import { formatDate } from '../utils';
+import { cn } from '../lib/utils';
 import * as React from 'react';
 
 export function ArticlesPage() {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
     const [selectedArticles, setSelectedArticles] = React.useState<Article[]>([]);
+    const [previewArticle, setPreviewArticle] = React.useState<Article | null>(null);
 
     // Fetch filters data
     const { data: categories = [] } = useQuery({
@@ -58,7 +61,21 @@ export function ArticlesPage() {
         }),
     });
 
-    // Bulk actions mutation
+    // Mutations
+    const deleteMutation = useMutation({
+        mutationFn: articlesService.delete,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['articles'] });
+            setSelectedArticles([]);
+        }
+    });
+
+    const updateMutation = useMutation({
+        mutationFn: ({ id, data }: { id: string, data: Partial<Article> }) =>
+            articlesService.update(id, data),
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['articles'] })
+    });
+
     const bulkUpdateMutation = useMutation({
         mutationFn: ({ ids, status }: { ids: string[], status: string }) =>
             articlesService.bulkUpdateStatus(ids, status),
@@ -67,6 +84,23 @@ export function ArticlesPage() {
             setSelectedArticles([]);
         }
     });
+
+    const handleToggleFeatured = (article: Article) => {
+        updateMutation.mutate({
+            id: article.id,
+            data: { featured: !article.featured }
+        });
+    };
+
+    const handleArchive = (id: string) => {
+        updateMutation.mutate({ id, data: { status: 'archived' } });
+    };
+
+    const handleDelete = (id: string) => {
+        if (window.confirm('Êtes-vous sûr de vouloir supprimer cet article ?')) {
+            deleteMutation.mutate(id);
+        }
+    };
 
     const columns: ColumnDef<Article>[] = [
         {
@@ -148,19 +182,40 @@ export function ArticlesPage() {
                     <button
                         onClick={() => navigate(`/articles/${row.original.id}/edit`)}
                         className="p-1.5 hover:bg-white border border-transparent hover:border-slate-100 rounded-lg text-slate-400 hover:text-indigo-600 transition-all"
+                        title="Modifier"
                     >
                         <Edit3 className="w-4 h-4" />
                     </button>
-                    <button className="p-1.5 hover:bg-white border border-transparent hover:border-slate-100 rounded-lg text-slate-400 hover:text-amber-600 transition-all">
-                        <Star className="w-4 h-4" />
+                    <button
+                        onClick={() => handleToggleFeatured(row.original)}
+                        className={cn(
+                            "p-1.5 hover:bg-white border border-transparent hover:border-slate-100 rounded-lg transition-all",
+                            row.original.featured ? "text-amber-400 hover:text-amber-500" : "text-slate-400 hover:text-amber-400"
+                        )}
+                        title={row.original.featured ? "Retirer de la une" : "Mettre à la une"}
+                    >
+                        <Star className={cn("w-4 h-4", row.original.featured && "fill-amber-400")} />
                     </button>
-                    <button className="p-1.5 hover:bg-white border border-transparent hover:border-slate-100 rounded-lg text-slate-400 hover:text-indigo-400 transition-all">
+                    <button
+                        onClick={() => handleArchive(row.original.id)}
+                        disabled={row.original.status === 'archived'}
+                        className="p-1.5 hover:bg-white border border-transparent hover:border-slate-100 rounded-lg text-slate-400 hover:text-indigo-400 transition-all disabled:opacity-30"
+                        title="Archiver"
+                    >
                         <Archive className="w-4 h-4" />
                     </button>
-                    <button className="p-1.5 hover:bg-white border border-transparent hover:border-slate-100 rounded-lg text-slate-400 hover:text-blue-500 transition-all">
+                    <button
+                        onClick={() => setPreviewArticle(row.original)}
+                        className="p-1.5 hover:bg-white border border-transparent hover:border-slate-100 rounded-lg text-slate-400 hover:text-blue-500 transition-all"
+                        title="Aperçu"
+                    >
                         <Eye className="w-4 h-4" />
                     </button>
-                    <button className="p-1.5 hover:bg-white border border-transparent hover:border-slate-100 rounded-lg text-slate-400 hover:text-red-500 transition-all">
+                    <button
+                        onClick={() => handleDelete(row.original.id)}
+                        className="p-1.5 hover:bg-white border border-transparent hover:border-slate-100 rounded-lg text-slate-400 hover:text-red-500 transition-all"
+                        title="Supprimer"
+                    >
                         <Trash2 className="w-4 h-4" />
                     </button>
                 </div>
@@ -170,6 +225,12 @@ export function ArticlesPage() {
 
     return (
         <div className="space-y-6">
+            <ArticlePreviewModal
+                article={previewArticle}
+                isOpen={!!previewArticle}
+                onClose={() => setPreviewArticle(null)}
+            />
+
             {/* Filters Area */}
             <ArticleFilters
                 onSearch={setSearch}
